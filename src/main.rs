@@ -6,8 +6,8 @@ struct Args {
     #[arg(
         short = 'f',
         long,
-        default_value_t = 45,
-        value_parser = clap::value_parser!(u16).range(1..=180),
+        default_value_t = 1,
+        value_parser = clap::value_parser!(u16).range(1..=10),
         help = "field of view angle in degrees"
     )]
     fov_angle_deg: u16,

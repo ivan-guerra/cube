@@ -27,48 +27,47 @@ struct Cube {
 
 impl Cube {
     fn default() -> Cube {
-        let scale = 50.0;
         Cube {
             vertices: [
                 mint::Point3 {
-                    x: -1.0 * scale,
-                    y: -1.0 * scale,
-                    z: -1.0 * scale,
+                    x: -1.0,
+                    y: -1.0,
+                    z: -1.0,
                 }, // Front bottom left
                 mint::Point3 {
-                    x: 1.0 * scale,
-                    y: -1.0 * scale,
-                    z: -1.0 * scale,
+                    x: 1.0,
+                    y: -1.0,
+                    z: -1.0,
                 }, // Front bottom right
                 mint::Point3 {
-                    x: 1.0 * scale,
-                    y: 1.0 * scale,
-                    z: -1.0 * scale,
+                    x: 1.0,
+                    y: 1.0,
+                    z: -1.0,
                 }, // Front top right
                 mint::Point3 {
-                    x: -1.0 * scale,
-                    y: 1.0 * scale,
-                    z: -1.0 * scale,
+                    x: -1.0,
+                    y: 1.0,
+                    z: -1.0,
                 }, // Front top left
                 mint::Point3 {
-                    x: -1.0 * scale,
-                    y: -1.0 * scale,
-                    z: 1.0 * scale,
+                    x: -1.0,
+                    y: -1.0,
+                    z: 1.0,
                 }, // Back bottom left
                 mint::Point3 {
-                    x: 1.0 * scale,
-                    y: -1.0 * scale,
-                    z: 1.0 * scale,
+                    x: 1.0,
+                    y: -1.0,
+                    z: 1.0,
                 }, // Back bottom right
                 mint::Point3 {
-                    x: 1.0 * scale,
-                    y: 1.0 * scale,
-                    z: 1.0 * scale,
+                    x: 1.0,
+                    y: 1.0,
+                    z: 1.0,
                 }, // Back top right
                 mint::Point3 {
-                    x: -1.0 * scale,
-                    y: 1.0 * scale,
-                    z: 1.0 * scale,
+                    x: -1.0,
+                    y: 1.0,
+                    z: 1.0,
                 }, // Back top left
             ],
         }
