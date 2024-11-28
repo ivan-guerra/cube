@@ -23,5 +23,6 @@ struct Args {
 }
 
 fn main() {
-    let _args = Args::parse();
+    let args = Args::parse();
+    let _camera_settings = cube::CameraSettings::new(args.fov_angle_deg, args.camera_dist);
 }
