@@ -180,9 +180,12 @@ impl event::EventHandler<ggez::GameError> for CubeState {
         Ok(())
     }
 
-    fn key_down_event(&mut self, _ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
+    fn key_down_event(&mut self, ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
         if let Some(key) = input.keycode {
-            self.update_cursor(key);
+            match key {
+                KeyCode::Escape => ctx.request_quit(),
+                _ => self.update_cursor(key),
+            }
         }
         Ok(())
     }
