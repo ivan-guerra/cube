@@ -25,8 +25,8 @@ struct Cube {
     vertices: [mint::Point3<f32>; 8],
 }
 
-impl Cube {
-    fn default() -> Cube {
+impl Default for Cube {
+    fn default() -> Self {
         Cube {
             vertices: [
                 mint::Point3 {
