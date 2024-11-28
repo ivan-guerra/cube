@@ -2,7 +2,7 @@
 name = "cube"
 version = "0.1.0"
 edition = "2021"
-description = "Render a cube in 3D"
+description = "Render a cube in 3D."
 license = "Unlicense"
 
 [dependencies]
