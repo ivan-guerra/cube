@@ -183,7 +183,7 @@ impl event::EventHandler<ggez::GameError> for CubeState {
     fn key_down_event(&mut self, ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
         if let Some(key) = input.keycode {
             match key {
-                KeyCode::Escape => ctx.request_quit(),
+                KeyCode::Q => ctx.request_quit(),
                 _ => self.update_cursor(key),
             }
         }
@@ -268,7 +268,7 @@ impl event::EventHandler<ggez::GameError> for CubeState {
         }
 
         // Draw help text
-        let text = graphics::Text::new("use the arrow keys to rotate the cube (press ESC to quit)");
+        let text = graphics::Text::new("use the arrow keys to rotate the cube (press 'q' to quit)");
         canvas.draw(
             &text,
             graphics::DrawParam::default()
