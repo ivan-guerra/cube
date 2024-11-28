@@ -267,6 +267,18 @@ impl event::EventHandler<ggez::GameError> for CubeState {
             canvas.draw(&circle, graphics::DrawParam::default());
         }
 
+        // Draw help text
+        let text = graphics::Text::new("use the arrow keys to rotate the cube (press ESC to quit)");
+        canvas.draw(
+            &text,
+            graphics::DrawParam::default()
+                .dest(mint::Point2 {
+                    x: 10.0,
+                    y: self.screen_height - 30.0,
+                })
+                .color(graphics::Color::WHITE),
+        );
+
         canvas.finish(ctx)?;
 
         Ok(())
