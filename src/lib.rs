@@ -1,8 +1,17 @@
+//! A 3D cube visualization module using the GGEZ game engine
+//!
+//! This module provides functionality for rendering and interacting with a 3D cube
+//! in a window. It includes features such as:
+//! * 3D to 2D projection
+//! * Camera controls
 use ggez::input::keyboard::{KeyCode, KeyInput};
 use ggez::{event, graphics, mint, Context, GameResult};
 
+/// Settings that control the camera's view and position
 pub struct CameraSettings {
+    /// Field of view angle in degrees
     pub fov_angle_deg: f32,
+    /// Distance of the camera from the target point
     pub camera_dist: f32,
 }
 
@@ -15,13 +24,19 @@ impl CameraSettings {
     }
 }
 
-struct Attitude {
-    yaw: f32,
-    pitch: f32,
-    roll: f32,
+/// Represents the orientation of an object in 3D space using Euler angles
+pub struct Attitude {
+    /// Rotation around the vertical axis in radians
+    pub yaw: f32,
+    /// Rotation around the lateral axis in radians
+    pub pitch: f32,
+    /// Rotation around the longitudinal axis in radians
+    pub roll: f32,
 }
 
+/// Represents a 3D cube defined by its 8 vertices in 3D space
 struct Cube {
+    /// Array of 8 vertices that define the corners of the cube
     vertices: [mint::Point3<f32>; 8],
 }
 
@@ -74,25 +89,39 @@ impl Default for Cube {
     }
 }
 
-fn get_rotated_point(point: &mint::Point3<f32>, attitude: &Attitude) -> mint::Point3<f32> {
+/// Rotates a 3D point according to the given attitude (orientation)
+///
+/// # Arguments
+///
+/// * `point` - The 3D point to be rotated
+/// * `attitude` - The orientation angles (yaw, pitch, roll) to rotate by
+///
+/// # Returns
+///
+/// A new `Point3<f32>` representing the rotated point
+pub fn get_rotated_point(point: &mint::Point3<f32>, attitude: &Attitude) -> mint::Point3<f32> {
+    // Yaw rotation matrix (around Z axis)
     let yaw_matrix = [
         [attitude.yaw.cos(), -attitude.yaw.sin(), 0.0],
         [attitude.yaw.sin(), attitude.yaw.cos(), 0.0],
         [0.0, 0.0, 1.0],
     ];
 
+    // Pitch rotation matrix (around Y axis)
     let pitch_matrix = [
         [attitude.pitch.cos(), 0.0, attitude.pitch.sin()],
         [0.0, 1.0, 0.0],
         [-attitude.pitch.sin(), 0.0, attitude.pitch.cos()],
     ];
 
+    // Roll rotation matrix (around X axis)
     let roll_matrix = [
         [1.0, 0.0, 0.0],
         [0.0, attitude.roll.cos(), -attitude.roll.sin()],
         [0.0, attitude.roll.sin(), attitude.roll.cos()],
     ];
 
+    // Helper function to multiply a 3x3 matrix with a point
     let multiply_matrix_point =
         |matrix: [[f32; 3]; 3], point: (f32, f32, f32)| -> (f32, f32, f32) {
             (
@@ -102,6 +131,7 @@ fn get_rotated_point(point: &mint::Point3<f32>, attitude: &Attitude) -> mint::Po
             )
         };
 
+    // Apply rotations in order: roll -> pitch -> yaw
     let (x1, y1, z1) = multiply_matrix_point(roll_matrix, (point.x, point.y, point.z));
     let (x2, y2, z2) = multiply_matrix_point(pitch_matrix, (x1, y1, z1));
     let (x3, y3, z3) = multiply_matrix_point(yaw_matrix, (x2, y2, z2));
@@ -113,7 +143,17 @@ fn get_rotated_point(point: &mint::Point3<f32>, attitude: &Attitude) -> mint::Po
     }
 }
 
-fn project_3d_to_2d(
+/// Projects a 3D point onto a 2D plane using perspective projection.
+///
+/// # Arguments
+///
+/// * `point` - A 3D point to be projected
+/// * `camera_settings` - Camera configuration parameters including field of view and distance
+///
+/// # Returns
+///
+/// A 2D point representing the projection of the input 3D point
+pub fn project_3d_to_2d(
     point: &mint::Point3<f32>,
     camera_settings: &CameraSettings,
 ) -> mint::Point2<f32> {
@@ -138,11 +178,17 @@ fn project_3d_to_2d(
     }
 }
 
+/// Represents the current state of the 3D cube visualization
 struct CubeState {
+    /// Camera configuration parameters including field of view and distance
     camera_settings: CameraSettings,
+    /// The 3D cube object being rendered
     cube: Cube,
+    /// Current cursor position on the screen
     cursor: mint::Point2<f32>,
+    /// Width of the screen in pixels
     screen_width: f32,
+    /// Height of the screen in pixels
     screen_height: f32,
 }
 
@@ -161,6 +207,14 @@ impl CubeState {
         }
     }
 
+    /// Updates the cursor position based on keyboard input
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The keyboard key that was pressed
+    ///
+    /// The cursor position wraps around the screen edges using modulo arithmetic.
+    /// Movement is fixed at 10 units per keypress in each direction.
     fn update_cursor(&mut self, key: KeyCode) {
         let (dx, dy) = match key {
             KeyCode::Up => (0.0, -10.0),
@@ -285,6 +339,15 @@ impl event::EventHandler<ggez::GameError> for CubeState {
     }
 }
 
+/// Initializes and runs the cube visualization application
+///
+/// # Arguments
+///
+/// * `camera_settings` - Configuration parameters for the camera including field of view and distance
+///
+/// # Returns
+///
+/// * `GameResult` - Result indicating whether the application ran successfully or encountered an error
 pub fn run(camera_settings: CameraSettings) -> GameResult {
     let cb = ggez::ContextBuilder::new("cube", "ieg");
     let (ctx, event_loop) = cb.build()?;
