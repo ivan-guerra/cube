@@ -163,16 +163,16 @@ impl CubeState {
     }
 
     fn update_cursor(&mut self, key: KeyCode) {
-        match key {
-            KeyCode::Up => self.cursor.y -= 10.0,
-            KeyCode::Down => self.cursor.y += 10.0,
-            KeyCode::Left => self.cursor.x += 10.0,
-            KeyCode::Right => self.cursor.x -= 10.0,
-            _ => (),
-        }
+        let (dx, dy) = match key {
+            KeyCode::Up => (0.0, -10.0),
+            KeyCode::Down => (0.0, 10.0),
+            KeyCode::Left => (10.0, 0.0),
+            KeyCode::Right => (-10.0, 0.0),
+            _ => return,
+        };
 
-        self.cursor.x = self.cursor.x.max(0.0).min(self.screen_width);
-        self.cursor.y = self.cursor.y.max(0.0).min(self.screen_height);
+        self.cursor.x = (self.cursor.x + dx + self.screen_width) % self.screen_width;
+        self.cursor.y = (self.cursor.y + dy + self.screen_height) % self.screen_height;
     }
 }
 
@@ -434,5 +434,102 @@ mod tests {
         assert!((rotated.x - 0.0).abs() < EPSILON);
         assert!((rotated.y - 0.0).abs() < EPSILON);
         assert!((rotated.z - -1.0).abs() < EPSILON);
+    }
+
+    #[test]
+    fn update_cursor_no_wraparound() {
+        let mut state = CubeState {
+            camera_settings: CameraSettings::new(90, 10),
+            cursor: mint::Point2 { x: 400.0, y: 300.0 },
+            cube: Cube::default(),
+            screen_width: 800.0,
+            screen_height: 600.0,
+        };
+
+        // Test right movement
+        let initial_x = state.cursor.x;
+        state.update_cursor(KeyCode::Right);
+        assert_eq!(
+            state.cursor.x,
+            (initial_x - 10.0 + state.screen_width) % state.screen_width
+        );
+
+        // Test left movement
+        let initial_x = state.cursor.x;
+        state.update_cursor(KeyCode::Left);
+        assert_eq!(
+            state.cursor.x,
+            (initial_x + 10.0 + state.screen_width) % state.screen_width
+        );
+
+        // Test down movement
+        let initial_y = state.cursor.y;
+        state.update_cursor(KeyCode::Down);
+        assert_eq!(
+            state.cursor.y,
+            (initial_y + 10.0 + state.screen_height) % state.screen_height
+        );
+
+        // Test up movement
+        let initial_y = state.cursor.y;
+        state.update_cursor(KeyCode::Up);
+        assert_eq!(
+            state.cursor.y,
+            (initial_y - 10.0 + state.screen_height) % state.screen_height
+        );
+    }
+
+    #[test]
+    fn update_cursor_with_wraparound() {
+        let mut state = CubeState {
+            camera_settings: CameraSettings::new(90, 10),
+            cursor: mint::Point2 { x: 400.0, y: 300.0 },
+            cube: Cube::default(),
+            screen_width: 800.0,
+            screen_height: 600.0,
+        };
+
+        // Test x wraparound (right edge)
+        state.cursor.x = state.screen_width - 5.0;
+        state.update_cursor(KeyCode::Right);
+        assert!(state.cursor.x < state.screen_width);
+        assert!(state.cursor.x >= 0.0);
+
+        // Test x wraparound (left edge)
+        state.cursor.x = 5.0;
+        state.update_cursor(KeyCode::Left);
+        assert!(state.cursor.x < state.screen_width);
+        assert!(state.cursor.x >= 0.0);
+
+        // Test y wraparound (bottom edge)
+        state.cursor.y = state.screen_height - 5.0;
+        state.update_cursor(KeyCode::Down);
+        assert!(state.cursor.y < state.screen_height);
+        assert!(state.cursor.y >= 0.0);
+
+        // Test y wraparound (top edge)
+        state.cursor.y = 5.0;
+        state.update_cursor(KeyCode::Up);
+        assert!(state.cursor.y < state.screen_height);
+        assert!(state.cursor.y >= 0.0);
+    }
+
+    #[test]
+    fn update_cursor_does_not_move_cursor_on_invalid_key() {
+        let mut state = CubeState {
+            camera_settings: CameraSettings::new(90, 10),
+            cursor: mint::Point2 { x: 400.0, y: 300.0 },
+            cube: Cube::default(),
+            screen_width: 800.0,
+            screen_height: 600.0,
+        };
+
+        let initial_x = state.cursor.x;
+        let initial_y = state.cursor.y;
+
+        // Test that cursor doesn't move with invalid key
+        state.update_cursor(KeyCode::Space);
+        assert_eq!(state.cursor.x, initial_x);
+        assert_eq!(state.cursor.y, initial_y);
     }
 }
