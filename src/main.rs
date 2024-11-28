@@ -15,7 +15,7 @@ struct Args {
     #[arg(
         short = 'c',
         long,
-        default_value_t = 45,
+        default_value_t = 256,
         value_parser = clap::value_parser!(u16).range(1..=1_000),
         help = "distance of camera from the center of the cube"
     )]
@@ -24,5 +24,8 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let _camera_settings = cube::CameraSettings::new(args.fov_angle_deg, args.camera_dist);
+    let camera_settings = cube::CameraSettings::new(args.fov_angle_deg, args.camera_dist);
+    if let Err(e) = cube::run(camera_settings) {
+        eprintln!("error: {}", e);
+    }
 }
